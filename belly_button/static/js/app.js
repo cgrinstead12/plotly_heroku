@@ -32,15 +32,28 @@ function buildCharts(sample) {
 
     d3.json(sData).then(function(response){
     // @TODO: Build a Bubble Chart using the sample data
-    console.log(response)
+    console.log(response);
+    data = []
+    for (var i = 0; i < response.otu_ids.length; i++) {
+      data.push({"otu_ids": response.otu_ids[i], "otu_labels": response.otu_labels[i], "sample_values": response.sample_values[i]});
+
+     };
+     data.sort((a, b) => b.sample_values - a.sample_values);
+     data = data.slice(0, 10);
+     console.log(data);
+
+     sValues = data.map(data => data.sample_values)
+     sIDS = data.map(data => data.otu_ids)
+     sLabels = data.map(data => data.otu_labels)
+
     var traceBubz = {
       mode: "markers",
-      x: response.otu_ids,
-      y: response.sample_values.slice(0, 10),
-      text: response.otu_labels,
+      x: sIDS,
+      y: sValues,
+      text: sLabels,
       marker: {
-        color: response.otu_ids,
-        size: response.sample_values
+        color: sIDS,
+        size: sValues
               },
       
       };
@@ -59,31 +72,25 @@ function buildCharts(sample) {
       };
 
       Plotly.newPlot("bubble", data, layout);
-    
+     
+      var tracePie = {
 
-    var tracePie = {
+        values: sValues,
+        labels: sIDS,
+        hovertext: sLabels,
+        type: "pie"};
+        dataPie = [tracePie];
 
-      values: response.sample_values.slice(0, 10),
-      labels: response.otu_ids,
-      hovertext: response.otu_labels,
-      type: 'pie'
-
+        var layoutPie = {
+        height: 400,
+        width: 800,
+        margin: {
+          t: 25,
+        }
       };
+      
+     Plotly.newPlot("pie", dataPie, layoutPie);
 
-      dataPie = [tracePie];
-
-      var layoutPie = {
-      height: 400,
-      width: 800,
-      margin: {
-        t: 25,
-      }
-    };
-  
-
-   Plotly.newPlot("pie", dataPie, layoutPie);
-
-  
 });
 };
 
